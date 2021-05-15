@@ -185,3 +185,59 @@ SELECT *
 FROM pointdf
 WHERE ST_Contains(ST_PolygonFromEnvelope(1.0,100.0,1000.0,1100.0), pointdf.pointshape)
 ```
+
+
+## ST_GeomFromGeotiff
+
+Introduction: Fetches Polygonal bounds for a raster image
+
+Format: `ST_GeomFromRaster (imageURL:String)`
+
+Since: `v1.0.0`
+
+Spark SQL example:
+```SQL
+SELECT ST_GeomFromGeotiff(imageURL) as Geom
+from geotiffDF
+```
+
+
+## ST_GeomWithBandsFromGeoTiff
+
+Introduction: Fetches Polygonal bounds and all the bands for a raster image
+
+Format: `ST_GeomWithBandsFromGeoTiff (imageURL:String, numBands:Int)`
+
+Since: `v1.0.0`
+
+Spark SQL example:
+```SQL
+val struct = Select ST_GeomWithBandsFromGeoTiff(imageURL, 4)
+as geotiffStruct
+from geotiff
+
+struct.createOrReplaceTempView("geotiffstruct")
+
+val result = Select geotiffStruct.Polygon as geom, geotiffStruct.bands as geotiffBand 
+from geotiffstruct
+
+result.createOrReplaceTempView("geotiffGeomWithBands")
+
+```
+
+
+## ST_GetBand
+
+Introduction: Fetches a particular band from result of ST_GeomWithBandsFromGeoTiff
+
+Format: `ST_GetBand (totalBands: Array[Double], targetband: Int, totalbands: Int)`
+
+Since: `v1.0.0`
+
+Spark SQL example:
+```SQL
+
+Select ST_GetBand(geotiffBand,2,3) as bandValue 
+from geotiffGeomWithBands
+```
+
